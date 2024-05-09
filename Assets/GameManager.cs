@@ -13,68 +13,85 @@ public class GameManager : MonoBehaviour
     {
         //string debugText = "";
 
-        map = new int[] { 0, 0, 0, 1, 0, 0, 0, 0, 0 };
-        playerIndex = -1;
+        map = new int[] { 0, 2, 0, 1, 0, 2, 0, 2, 0 };
+        PrintArray();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.RightArrow)) //Every frame//GetKeyDown only when you clicked it// GetKeyUp is when you stop pressing the button
+        if (Input.GetKeyDown(KeyCode.RightArrow)) //GetKey Every frame//GetKeyDown only when you clicked it// GetKeyUp is when you stop pressing the button
         {
 
-            for (int i = 0; i < map.Length; i++)
-            {
-                if (map[i] == 1) //Find the player
-                {
-                    playerIndex = i;
-                    break;
-                }
-            }
+            int playerIndex = GetPlayerIndex();
 
-            if (playerIndex < map.Length - 1) //if were not at the end
-            {
-                map[playerIndex + 1] = 1; //move to the right
-                map[playerIndex] = 0; //the place we were at becomes zero
-            }
+            MoveNumber(1, playerIndex, playerIndex + 1);
 
-            string debugText = "";
-            for (int i = 0; i < map.Length; i++)
-            {
-                debugText += map[i].ToString() + ",";
-            }
-
-            Debug.Log(debugText);
-
+            PrintArray();
         }
 
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            for (int i = 0; i < map.Length; i++)
-            {
-                if (map[i] == 1) //Find the player
-                {
-                    playerIndex = i;
-                    break;
-                }
-            }
+            int playerIndex = GetPlayerIndex();
 
-            if (playerIndex > 0) //if were not at the beginning
-            {
-                map[playerIndex - 1] = 1; //move to the left
-                map[playerIndex] = 0; //the place we were at becomes zero
-            }
-            string debugText1 = "";
-            for (int i = 0; i < map.Length; i++)
-            {
-                debugText1 += map[i].ToString() + ",";
-            }
-            Debug.Log(debugText1);
+            MoveNumber(1, playerIndex, playerIndex - 1);
+
+            PrintArray();
         }
-
-
     }
 
+    void PrintArray()
+    {
+        string debugText = "";
+        for (int i = 0; i < map.Length; i++)
+        {
+            debugText += map[i].ToString() + ",";
+        }
+        Debug.Log(debugText);
+    }
+
+    int GetPlayerIndex()
+    {
+        playerIndex = -1;
+
+        for (int i = 0; i < map.Length; i++)
+        {
+            if (map[i] == 1) //Find the player
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    bool MoveNumber(int number, int moveFrom, int moveTo)
+    {
+        if(moveTo < 0 || moveTo >= map.Length) //if we are outside of the map
+        {
+            return false; //dont return anything
+        }
+
+        if (map[moveTo] == 2) //if there is a 2 where we are trying to go
+        {
+            int velocity = moveTo - moveFrom;
+            bool success = MoveNumber(2, moveTo, moveTo + velocity);
+            if (!success)
+            {
+                return false;
+            }
+        }
+
+        map[moveTo] = number; //the place we moved to becomes 1
+        map[moveFrom] = 0; //the place we came from becomes 0
+
+        return true;
+    }
 }
+
+//if (playerIndex < map.Length - 1) //if were not at the end
+//{
+//    map[playerIndex + 1] = 1; //move to the right
+//    map[playerIndex] = 0; //the place we were at becomes zero
+//}
 
 

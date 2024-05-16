@@ -27,10 +27,10 @@ public class GameManager : MonoBehaviour
         { 0, 0, 0, 0, 0, 0 },
 
         };
-        field = new GameObject
+        field = new GameObject //create a gameobject
         [
-         map.GetLength(0),
-         map.GetLength(1)
+         map.GetLength(0), //that is the same as our map
+         map.GetLength(1) // ^^
         ];
 
 
@@ -43,12 +43,12 @@ public class GameManager : MonoBehaviour
         {
             for (int x = 0; x < map.GetLength(1); x++)
             {
-                if (map[y, x] == 1)
+                if (map[y, x] == 1) //found player
                 {
                     field[y, x] = Instantiate(playerPrefab, new Vector3(x, map.GetLength(0) - y, 0), Quaternion.identity);
                 }
 
-                if (map[y, x] == 2)
+                if (map[y, x] == 2) //found block
                 {
                     field[y, x] = Instantiate(boxPrefab, new Vector3(x, map.GetLength(0) - y, 0), Quaternion.identity);
                 }
@@ -68,7 +68,7 @@ public class GameManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.RightArrow)) //GetKey Every frame//GetKeyDown only when you clicked it// GetKeyUp is when you stop pressing the button
         {
 
-            Vector2Int playerIndex = GetPlayerIndex();
+            var playerIndex = GetPlayerIndex(); //same as auto, it finds the appropriate type
 
             MoveNumber(playerIndex, playerIndex + new Vector2Int(1, 0));
 
@@ -77,7 +77,7 @@ public class GameManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            Vector2Int playerIndex = GetPlayerIndex();
+            var playerIndex = GetPlayerIndex();
 
             MoveNumber(playerIndex, playerIndex + new Vector2Int(-1,0));
 
@@ -86,7 +86,7 @@ public class GameManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.DownArrow))
         {
-            Vector2Int playerIndex = GetPlayerIndex();
+            var playerIndex = GetPlayerIndex();
 
             MoveNumber(playerIndex, playerIndex + new Vector2Int(0, 1));
 
@@ -95,7 +95,7 @@ public class GameManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.UpArrow))
         {
-            Vector2Int playerIndex = GetPlayerIndex();
+            var playerIndex = GetPlayerIndex();
 
             MoveNumber(playerIndex, playerIndex + new Vector2Int(0, -1));
 
@@ -115,15 +115,16 @@ public class GameManager : MonoBehaviour
 
     Vector2Int GetPlayerIndex()
     {
-        for (int y = 0; y < map.GetLength(0); y++)
+        for (int y = 0; y < field.GetLength(0); y++)
         {
-            for (int x = 0; x < map.GetLength(1); x++)
+            for (int x = 0; x < field.GetLength(1); x++)
             {
+                GameObject obj = field[y, x];
                 if (field[y, x] == null)
                 {
                     continue;
                 }
-                if (field[y,x].tag == "Player")
+                if (obj?.tag == "Player") //? is a null check. Which means if obj.tag is not null then d
                 {
                     return new Vector2Int(x, y);
                 }
@@ -174,7 +175,7 @@ public class GameManager : MonoBehaviour
             //
             // return true;
 
-            field[moveTo.y, moveTo.x] = field[moveFrom.y, moveFrom.x];
+        field[moveTo.y, moveTo.x] = field[moveFrom.y, moveFrom.x];
         field[moveFrom.y, moveFrom.x].transform.position = new Vector3(moveTo.x, map.GetLength(0) - moveTo.y, 0);
         field[moveFrom.y, moveFrom.x] = null;
         return true;

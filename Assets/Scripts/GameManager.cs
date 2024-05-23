@@ -8,9 +8,12 @@ public class GameManager : MonoBehaviour
     public GameObject playerPrefab;
     public GameObject boxPrefab;
     public GameObject goalPrefab;
+    public GameObject particlePrefab;
   
     public GameObject clearText;
+    //Initialize
     int[,] map;
+    //updated position
     GameObject[,] field;
     int playerIndex;
     // GameObject instance;
@@ -18,7 +21,9 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //string debugText = "";
+        clearText.SetActive(false);
+
+        Screen.SetResolution(1280, 720, false);
 
 
         map = new int[,] //1 = player, 2 = block, 3= goal
@@ -69,21 +74,24 @@ public class GameManager : MonoBehaviour
             //debugText += "\n";
         }
         //Debug.Log(debugText);
-
     }
 
 
     // Update is called once per frame
     void Update()
     {
+       
         if (Input.GetKeyDown(KeyCode.RightArrow)) //GetKey Every frame//GetKeyDown only when you clicked it// GetKeyUp is when you stop pressing the button
         {
 
             var playerIndex = GetPlayerIndex(); //same as auto, it finds the appropriate type
 
             MoveNumber(playerIndex, playerIndex + new Vector2Int(1, 0));
-
             //PrintArray();
+            if (IsCleared())
+            {
+                clearText.SetActive(true);
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.LeftArrow))
@@ -93,6 +101,10 @@ public class GameManager : MonoBehaviour
             MoveNumber(playerIndex, playerIndex + new Vector2Int(-1, 0));
 
             //PrintArray();
+            if (IsCleared())
+            {
+                clearText.SetActive(true);
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.DownArrow))
@@ -102,6 +114,10 @@ public class GameManager : MonoBehaviour
             MoveNumber(playerIndex, playerIndex + new Vector2Int(0, 1));
 
             //PrintArray();
+            if (IsCleared())
+            {
+                clearText.SetActive(true);
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.UpArrow))
@@ -111,12 +127,13 @@ public class GameManager : MonoBehaviour
             MoveNumber(playerIndex, playerIndex + new Vector2Int(0, -1));
 
             //PrintArray();
+            if (IsCleared())
+            {
+                clearText.SetActive(true);
+            }
         }
 
-        if (IsCleared())
-        {
-            clearText.SetActive(true);
-        }
+       
     }
 
     //    void PrintArray()
@@ -190,10 +207,16 @@ public class GameManager : MonoBehaviour
         // map[moveFrom] = 0; //the place we came from becomes 0
         //
         // return true;
-
+        for (int i = 0; i < 5; i++)
+        {
+            Instantiate(particlePrefab, field[moveFrom.y, moveFrom.x].transform.position, Quaternion.identity);
+        }
         field[moveTo.y, moveTo.x] = field[moveFrom.y, moveFrom.x];
-        field[moveFrom.y, moveFrom.x].transform.position = new Vector3(moveTo.x, map.GetLength(0) - moveTo.y, 0);
+        //field[moveFrom.y, moveFrom.x].transform.position = new Vector3(moveTo.x, map.GetLength(0) - moveTo.y, 0);
+        Vector3 moveToPosition = new Vector3(moveTo.x, map.GetLength(0) - moveTo.y, 0);
+        field[moveTo.y, moveFrom.x].GetComponent<Move>().MoveTo(moveToPosition);
         field[moveFrom.y, moveFrom.x] = null;
+       
         return true;
 
 
@@ -201,6 +224,7 @@ public class GameManager : MonoBehaviour
 
     bool IsCleared()
     {
+        //same as Vector in C++
         List<Vector2Int> goals = new List<Vector2Int>();
 
         for (int y = 0; y < map.GetLength(0); y++)
@@ -214,6 +238,15 @@ public class GameManager : MonoBehaviour
 
             }
         }
+
+        //foreach(var g in goals)
+        //{
+        //    var go = field[g.y, g.y];
+        //    if(go == null  || go.tag != "Box")
+        //    {
+        //        return false;
+        //    }
+        //}
 
         for (int i = 0; i < goals.Count; i++)
         {

@@ -7,6 +7,9 @@ public class GameManager : MonoBehaviour
 {
     public GameObject playerPrefab;
     public GameObject boxPrefab;
+    public GameObject goalPrefab;
+  
+    public GameObject clearText;
     int[,] map;
     GameObject[,] field;
     int playerIndex;
@@ -52,6 +55,12 @@ public class GameManager : MonoBehaviour
                 if (map[y, x] == 2) //found block
                 {
                     field[y, x] = Instantiate(boxPrefab, new Vector3(x, map.GetLength(0) - y, 0), Quaternion.identity);
+                    break;
+                }
+
+                if (map[y, x] == 3) //found block
+                {
+                    field[y, x] = Instantiate(goalPrefab, new Vector3(x, map.GetLength(0) - y, 0.01f), Quaternion.identity);
                     break;
                 }
 
@@ -106,7 +115,7 @@ public class GameManager : MonoBehaviour
 
         if (IsCleared())
         {
-            Debug.Log("Clear");
+            clearText.SetActive(true);
         }
     }
 

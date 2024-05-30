@@ -1,78 +1,88 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+   // private bool isGameCleared = false;
     public GameObject playerPrefab;
     public GameObject boxPrefab;
     public GameObject goalPrefab;
     public GameObject particlePrefab;
-  
+    public GameObject wallPrefab;
     public GameObject clearText;
+    [SerializeField] Material[] _mats; //List of all the materials we want to change between
+    Renderer _r;
+    private Dictionary<GameObject, bool> boxMaterialChanged;     // Dictionary to track boxes that have changed their material
+    int _i;
+    //private bool isStage1Clear = false;
+    private float timer = 0;
+    [SerializeField]
+    private int stageNumber;
+
     //Initialize
-    int[,] map;
+    int[,,] map;
     //updated position
     GameObject[,] field;
     int playerIndex;
-    // GameObject instance;
+    
 
     // Start is called before the first frame update
     void Start()
     {
+        _r = GetComponent<Renderer>();
         clearText.SetActive(false);
 
         Screen.SetResolution(1280, 720, false);
 
-
-        map = new int[,] //1 = player, 2 = block, 3= goal
+        map = new int[,,] //1 = player, 2 = block, 3= goal, 4 wall
         {
+          {
+            { 4, 4, 4, 4, 4, 4, 0, 0, 0 },
+            { 4, 0, 1, 2, 3, 4, 0, 0, 0 },
+            { 4, 0, 0, 2, 0, 4, 0, 0, 0 },
+            { 4, 0, 0, 0, 0, 4, 0, 0, 0 },
+            { 4, 3, 0, 0, 0, 4, 0, 0, 0 },
+            { 4, 4, 4, 4, 4, 4, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            
+          },
 
-        { 0, 0, 0, 0, 0, 3 },
-        { 0, 0, 1, 2, 0, 0 },
-        { 0, 0, 0, 2, 0, 0 },
-        { 0, 3, 0, 0, 0, 0 },
+          {
+            { 4, 4, 4, 4, 4, 4, 4, 4, 4 },
+            { 4, 0, 1, 0, 3, 0, 2, 0, 4 },
+            { 4, 0, 0, 2, 0, 0, 0, 0, 4 },
+            { 4, 0, 0, 0, 0, 0, 0, 0, 4 },
+            { 4, 3, 0, 0, 0, 0, 2, 0, 4 },
+            { 4, 0, 2, 0, 0, 0, 0, 0, 4 },
+            { 4, 0, 0, 0, 3, 0, 0, 0, 4 },
+            { 4, 0, 0, 0, 0, 0, 3, 0, 4 },
+            { 4, 4, 4, 4, 4, 4, 4, 4, 4 },
+
+         },
 
         };
         field = new GameObject //create a gameobject
         [
-         map.GetLength(0), //that is the same as our map
-         map.GetLength(1) // ^^
+         map.GetLength(1), //that is the same as our map
+         map.GetLength(2) // ^^
         ];
-
+        boxMaterialChanged = new Dictionary<GameObject, bool>();
+        InitializeField();
+        
 
 
         // PrintArray();
 
         // string debugText = "";
 
-        for (int y = 0; y < map.GetLength(0); y++)
-        {
-            for (int x = 0; x < map.GetLength(1); x++)
-            {
-                if (map[y, x] == 1) //found player
-                {
-                    field[y, x] = Instantiate(playerPrefab, new Vector3(x, map.GetLength(0) - y, 0), Quaternion.identity);
-                    
-                }
 
-                if (map[y, x] == 2) //found block
-                {
-                    field[y, x] = Instantiate(boxPrefab, new Vector3(x, map.GetLength(0) - y, 0), Quaternion.identity);
-                    break;
-                }
-
-                if (map[y, x] == 3) //found block
-                {
-                    field[y, x] = Instantiate(goalPrefab, new Vector3(x, map.GetLength(0) - y, 0.01f), Quaternion.identity);
-                    break;
-                }
-
-                //debugText += map[y, x].ToString() + ",";
-            }
-            //debugText += "\n";
-        }
         //Debug.Log(debugText);
     }
 
@@ -80,7 +90,24 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-       
+        if (StageClearTimer()) 
+        {
+            Scene scene = SceneManager.GetActiveScene();
+
+            if (scene.name == "SampleScene")
+            {
+                timer = 0.0f;
+                SceneManager.LoadScene("Stage2");
+                
+            }
+            else if (scene.name == "Stage2")
+            {
+                timer = 0.0f;
+                SceneManager.LoadScene("SampleScene");
+
+            }
+        };
+
         if (Input.GetKeyDown(KeyCode.RightArrow)) //GetKey Every frame//GetKeyDown only when you clicked it// GetKeyUp is when you stop pressing the button
         {
 
@@ -88,6 +115,7 @@ public class GameManager : MonoBehaviour
 
             MoveNumber(playerIndex, playerIndex + new Vector2Int(1, 0));
             //PrintArray();
+            CheckAndChangeBoxMaterial();
             if (IsCleared())
             {
                 clearText.SetActive(true);
@@ -99,12 +127,15 @@ public class GameManager : MonoBehaviour
             var playerIndex = GetPlayerIndex();
 
             MoveNumber(playerIndex, playerIndex + new Vector2Int(-1, 0));
-
+            CheckAndChangeBoxMaterial();
             //PrintArray();
             if (IsCleared())
             {
                 clearText.SetActive(true);
+               
+
             }
+            
         }
 
         if (Input.GetKeyDown(KeyCode.DownArrow))
@@ -112,10 +143,11 @@ public class GameManager : MonoBehaviour
             var playerIndex = GetPlayerIndex();
 
             MoveNumber(playerIndex, playerIndex + new Vector2Int(0, 1));
-
+            CheckAndChangeBoxMaterial();
             //PrintArray();
             if (IsCleared())
             {
+            
                 clearText.SetActive(true);
             }
         }
@@ -125,26 +157,24 @@ public class GameManager : MonoBehaviour
             var playerIndex = GetPlayerIndex();
 
             MoveNumber(playerIndex, playerIndex + new Vector2Int(0, -1));
-
+            CheckAndChangeBoxMaterial();
             //PrintArray();
             if (IsCleared())
             {
+
+                Scene scene = SceneManager.GetActiveScene();
+              
                 clearText.SetActive(true);
+                
             }
         }
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            ResetGame();
+        }
 
-       
     }
 
-    //    void PrintArray()
-    //    {
-    //        string debugText = "";
-    //        for (int i = 0; i < map.Length; i++)
-    //        {
-    //            debugText += map[i].ToString() + ",";
-    //        }
-    //        Debug.Log(debugText);
-    //    }
 
     Vector2Int GetPlayerIndex()
     {
@@ -181,9 +211,21 @@ public class GameManager : MonoBehaviour
             return false; //dont return anything
         }
 
+        if (field[moveTo.y, moveTo.x] != null && field[moveTo.y, moveTo.x].tag == "Wall")
+        {
+            return false;
+        }
+
         if (field[moveTo.y, moveTo.x] != null && field[moveTo.y, moveTo.x].tag == "Box")
         {
             {
+                GameObject box = field[moveTo.y, moveTo.x];
+
+                // Check if the box material has been changed
+                if (boxMaterialChanged.ContainsKey(box) && boxMaterialChanged[box]) 
+                {
+                    return false; // Box has already been moved and its material changed
+                }
                 Vector2Int velocity = moveTo - moveFrom;
                 bool success = MoveNumber(moveTo, moveTo + velocity);
                 if (!success)
@@ -227,11 +269,14 @@ public class GameManager : MonoBehaviour
         //same as Vector in C++
         List<Vector2Int> goals = new List<Vector2Int>();
 
-        for (int y = 0; y < map.GetLength(0); y++)
+        
+
+        for (int y = 0; y < map.GetLength(1); y++)
         {
-            for (int x = 0; x < map.GetLength(1); x++)
+            for (int x = 0; x < map.GetLength(2); x++)
             {
-                if (map[y, x] == 3) //found a goal
+               
+                if (map[stageNumber, y, x] == 3) //found a goal
                 {
                     goals.Add(new Vector2Int(x, y)); //add the pos to goals
                 }
@@ -255,10 +300,116 @@ public class GameManager : MonoBehaviour
             {
                 return false; //this is false
             }
+            
+        }
+        return true;
+    }
+
+    void InitializeField()
+    {
+        var objects = GameObject.FindGameObjectsWithTag("Goal");
+        foreach (var obj in objects) { Destroy(obj); }
+
+        for (int y = 0; y < map.GetLength(1); y++)
+        {
+            for (int x = 0; x < map.GetLength(2); x++)
+            {
+                if (field[y, x] != null)
+                {
+                    Destroy(field[y, x]);
+                }
+                if (map[stageNumber, y, x] == 1) //found player
+                {
+                    field[y, x] = Instantiate(playerPrefab, new Vector3(x, map.GetLength(0) - y, 0), Quaternion.identity);
+
+                }
+
+                if (map[stageNumber, y, x] == 2) //found block
+                {
+                    field[y, x] = Instantiate(boxPrefab, new Vector3(x, map.GetLength(0) - y, 0), Quaternion.identity);
+                    //break;
+                }
+
+                if (map[stageNumber, y, x] == 3) //found goal
+                {
+                    field[y, x] = Instantiate(goalPrefab, new Vector3(x, map.GetLength(0) - y, 0.01f), Quaternion.identity);
+                    //break;
+                }
+
+                if (map[stageNumber, y, x] == 4) //found block
+                {
+                    field[y, x] = Instantiate(wallPrefab, new Vector3(x, map.GetLength(0) - y, 0.01f), Quaternion.identity);
+                    //break;
+                }
+            }
+        }
+    }
+
+    void CheckAndChangeBoxMaterial()
+    {
+        for (int y = 0; y < map.GetLength(1); y++)
+        {
+            for (int x = 0; x < map.GetLength(2); x++)
+            {
+                if (map[stageNumber, y, x] == 3)
+                {
+                    GameObject f = field[y, x];
+
+                    if (f != null && f.tag == "Box" && !boxMaterialChanged.ContainsKey(f))
+                    {
+                        Renderer boxRenderer = f.GetComponent<Renderer>();
+                        if (boxRenderer != null)
+                        {
+                            boxRenderer.material = _mats[1];
+                            _i++;
+                            boxMaterialChanged[f] = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    void ResetGame()
+    {
+        clearText.SetActive(false);
+
+        InitializeField();
+        boxMaterialChanged.Clear();
+        _i = 0;
+
+        //isGameCleared = false;
+
+        Vector2Int startPosition = new Vector2Int(1, 2);
+        GameObject player = field[startPosition.y, startPosition.x];
+        if (player != null && player.tag == "Player")
+        {
+            player.transform.position = IndexToPosition(startPosition);
         }
 
-        return true;
+    }
 
+    bool StageClearTimer()
+    {
+        if (IsCleared())
+        {
+            timer += Time.deltaTime;
+        }
+
+        if(timer >= 2.0f)
+        {
+            //isStage1Clear = true;
+            return true;
+        }
+        return false;
+    }
+
+    Vector3 IndexToPosition(Vector2Int index)
+    {
+        return new Vector3(
+            index.x - map.GetLength(1) / 2 + 0.5f,
+            index.y - map.GetLength(0) / 2 + 0.5f, 0
+            );
     }
 
 }

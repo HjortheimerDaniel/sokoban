@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-   // private bool isGameCleared = false;
+    // private bool isGameCleared = false;
     public GameObject playerPrefab;
     public GameObject boxPrefab;
     public GameObject goalPrefab;
@@ -23,13 +23,18 @@ public class GameManager : MonoBehaviour
     private float timer = 0;
     [SerializeField]
     private int stageNumber;
+    SFXManager SFXManager;
 
     //Initialize
     int[,,] map;
     //updated position
     GameObject[,] field;
     int playerIndex;
-    
+
+    private void Awake()
+    {
+        SFXManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<SFXManager>();
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -42,32 +47,52 @@ public class GameManager : MonoBehaviour
         map = new int[,,] //1 = player, 2 = block, 3= goal, 4 wall
         {
           {
-            { 4, 4, 4, 4, 4, 4, 0, 0, 0 },
-            { 4, 0, 1, 2, 3, 4, 0, 0, 0 },
-            { 4, 0, 0, 2, 0, 4, 0, 0, 0 },
-            { 4, 0, 0, 0, 0, 4, 0, 0, 0 },
-            { 4, 3, 0, 0, 0, 4, 0, 0, 0 },
-            { 4, 4, 4, 4, 4, 4, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-            
+            { 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0 },
+            { 4, 0, 1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0 },
+            { 4, 0, 0, 2, 0, 4, 0, 0, 0, 0, 0, 0, 0 },
+            { 4, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0 },
+            { 4, 3, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0 },
+            { 4, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+
           },
 
           {
-            { 4, 4, 4, 4, 4, 4, 4, 4, 4 },
-            { 4, 0, 1, 0, 3, 0, 2, 0, 4 },
-            { 4, 0, 0, 2, 0, 0, 0, 0, 4 },
-            { 4, 0, 0, 0, 0, 0, 0, 0, 4 },
-            { 4, 3, 0, 0, 0, 0, 2, 0, 4 },
-            { 4, 0, 2, 0, 0, 0, 0, 0, 4 },
-            { 4, 0, 0, 0, 3, 0, 0, 0, 4 },
-            { 4, 0, 0, 0, 0, 0, 3, 0, 4 },
-            { 4, 4, 4, 4, 4, 4, 4, 4, 4 },
+            { 4, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0},
+            { 4, 0, 1, 0, 3, 0, 2, 0, 4, 0, 0, 0, 0},
+            { 4, 0, 0, 2, 0, 0, 0, 0, 4, 0, 0, 0, 0},
+            { 4, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0},
+            { 4, 3, 0, 0, 0, 0, 2, 0, 4, 0, 0, 0, 0},
+            { 4, 0, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0},
+            { 4, 0, 0, 0, 3, 0, 0, 0, 4, 0, 0, 0, 0},
+            { 4, 0, 0, 0, 0, 0, 3, 0, 4, 0, 0, 0, 0},
+            { 4, 4, 4, 4, 4, 4, 4, 4, 4, 0, 0, 0, 0},
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+           },
 
-         },
-
+           {
+            { 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
+            { 4, 0, 1, 0, 0, 0, 4, 0, 0, 0, 0, 0, 4},
+            { 4, 0, 0, 2, 0, 0, 4, 0, 0, 0, 0, 0, 4},
+            { 4, 4, 4, 4, 4, 3, 0, 0, 0, 4, 2, 0, 4},
+            { 4, 3, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 4},
+            { 4, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 4},
+            { 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4},
+            { 4, 0, 4, 0, 0, 0, 0, 0, 0, 0, 4, 0, 4},
+            { 4, 2, 0, 0, 4, 0, 3, 0, 0, 2, 4, 3, 4},
+            { 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 4},
+            { 4, 3, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 4},
+            { 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4},
+           }
         };
+
         field = new GameObject //create a gameobject
         [
          map.GetLength(1), //that is the same as our map
@@ -103,16 +128,21 @@ public class GameManager : MonoBehaviour
             else if (scene.name == "Stage2")
             {
                 timer = 0.0f;
-                SceneManager.LoadScene("SampleScene");
+                SceneManager.LoadScene("Stage3");
+
+            }
+            else if (scene.name == "Stage3")
+            {
+                timer = 0.0f;
+                SceneManager.LoadScene("ClearScreen");
 
             }
         };
 
         if (Input.GetKeyDown(KeyCode.RightArrow)) //GetKey Every frame//GetKeyDown only when you clicked it// GetKeyUp is when you stop pressing the button
         {
-
             var playerIndex = GetPlayerIndex(); //same as auto, it finds the appropriate type
-
+            
             MoveNumber(playerIndex, playerIndex + new Vector2Int(1, 0));
             //PrintArray();
             CheckAndChangeBoxMaterial();
@@ -163,9 +193,9 @@ public class GameManager : MonoBehaviour
             {
 
                 Scene scene = SceneManager.GetActiveScene();
-              
                 clearText.SetActive(true);
-                
+
+
             }
         }
         if (Input.GetKeyDown(KeyCode.R))
@@ -213,6 +243,8 @@ public class GameManager : MonoBehaviour
 
         if (field[moveTo.y, moveTo.x] != null && field[moveTo.y, moveTo.x].tag == "Wall")
         {
+            SFXManager.PlaySFX(SFXManager.touchedWall);
+
             return false;
         }
 
@@ -224,6 +256,7 @@ public class GameManager : MonoBehaviour
                 // Check if the box material has been changed
                 if (boxMaterialChanged.ContainsKey(box) && boxMaterialChanged[box]) 
                 {
+                    SFXManager.PlaySFX(SFXManager.touchedWall);
                     return false; // Box has already been moved and its material changed
                 }
                 Vector2Int velocity = moveTo - moveFrom;
@@ -258,7 +291,8 @@ public class GameManager : MonoBehaviour
         Vector3 moveToPosition = new Vector3(moveTo.x, map.GetLength(0) - moveTo.y, 0);
         field[moveTo.y, moveFrom.x].GetComponent<Move>().MoveTo(moveToPosition);
         field[moveFrom.y, moveFrom.x] = null;
-       
+        SFXManager.PlaySFX(SFXManager.walk);
+
         return true;
 
 
@@ -303,6 +337,7 @@ public class GameManager : MonoBehaviour
             
         }
         return true;
+
     }
 
     void InitializeField()
@@ -360,6 +395,7 @@ public class GameManager : MonoBehaviour
                         Renderer boxRenderer = f.GetComponent<Renderer>();
                         if (boxRenderer != null)
                         {
+                            SFXManager.PlaySFX(SFXManager.goal);
                             boxRenderer.material = _mats[1];
                             _i++;
                             boxMaterialChanged[f] = true;

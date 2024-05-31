@@ -1,8 +1,8 @@
-using System.Collections;
+//using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
+//using System.Runtime.InteropServices.WindowsRuntime;
+//using Unity.VisualScripting;
+//using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -33,12 +33,15 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        SFXManager = GameObject.FindGameObjectWithTag("Audio").GetComponent<SFXManager>();
     }
 
     // Start is called before the first frame update
     void Start()
     {
+        Debug.Log("NowScene " + SceneManager.GetActiveScene().name);
+        Debug.Log("i'm " + gameObject.name);
+        GameObject sfxManagerObject = GameObject.FindGameObjectWithTag("Audio");
+        SFXManager = sfxManagerObject.GetComponent<SFXManager>();
         _r = GetComponent<Renderer>();
         clearText.SetActive(false);
 
@@ -291,6 +294,9 @@ public class GameManager : MonoBehaviour
         Vector3 moveToPosition = new Vector3(moveTo.x, map.GetLength(0) - moveTo.y, 0);
         field[moveTo.y, moveFrom.x].GetComponent<Move>().MoveTo(moveToPosition);
         field[moveFrom.y, moveFrom.x] = null;
+        Debug.Log("i'm " + gameObject.name);
+        Debug.Log("NowScene " + SceneManager.GetActiveScene().name);
+
         SFXManager.PlaySFX(SFXManager.walk);
 
         return true;

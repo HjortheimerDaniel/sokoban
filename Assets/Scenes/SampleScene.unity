@@ -158,7 +158,6 @@ MonoBehaviour:
   walk: {fileID: 8300000, guid: ffb159a21c8a04135a5616979c828fab, type: 3}
   touchedWall: {fileID: 8300000, guid: b99da9a57308d4ba1bee1cf1d9038376, type: 3}
   goal: {fileID: 8300000, guid: 0c008ee3ee72a4362a35be25fa5de043, type: 3}
-  clear: {fileID: 8300000, guid: 2667a0a008b044e218b63df62e2be749, type: 3}
 --- !u!82 &82983503
 AudioSource:
   m_ObjectHideFlags: 0
@@ -1009,6 +1008,10 @@ PrefabInstance:
     - target: {fileID: 5106429512871013042, guid: 6bba011615d41b0408ae30c66004c556, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6885357282923184430, guid: 6bba011615d41b0408ae30c66004c556, type: 3}
+      propertyPath: m_text
+      value: Stage Clear!!
       objectReference: {fileID: 0}
     - target: {fileID: 6885357282923184430, guid: 6bba011615d41b0408ae30c66004c556, type: 3}
       propertyPath: m_fontSize

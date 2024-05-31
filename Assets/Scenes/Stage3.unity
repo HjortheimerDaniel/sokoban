@@ -1011,7 +1011,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6885357282923184430, guid: 6bba011615d41b0408ae30c66004c556, type: 3}
       propertyPath: m_text
-      value: Stage Clear!!
+      value: Game Clear!!
       objectReference: {fileID: 0}
     - target: {fileID: 6885357282923184430, guid: 6bba011615d41b0408ae30c66004c556, type: 3}
       propertyPath: m_fontSize

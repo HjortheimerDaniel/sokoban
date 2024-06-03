@@ -294,9 +294,6 @@ public class GameManager : MonoBehaviour
         Vector3 moveToPosition = new Vector3(moveTo.x, map.GetLength(0) - moveTo.y, 0);
         field[moveTo.y, moveFrom.x].GetComponent<Move>().MoveTo(moveToPosition);
         field[moveFrom.y, moveFrom.x] = null;
-        Debug.Log("i'm " + gameObject.name);
-        Debug.Log("NowScene " + SceneManager.GetActiveScene().name);
-
         SFXManager.PlaySFX(SFXManager.walk);
 
         return true;

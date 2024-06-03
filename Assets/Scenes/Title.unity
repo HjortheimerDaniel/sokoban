@@ -1467,7 +1467,7 @@ MonoBehaviour:
   SFXSource: {fileID: 200237615}
   walk: {fileID: 8300000, guid: ffb159a21c8a04135a5616979c828fab, type: 3}
   touchedWall: {fileID: 8300000, guid: b99da9a57308d4ba1bee1cf1d9038376, type: 3}
-  goal: {fileID: 8300000, guid: 0c008ee3ee72a4362a35be25fa5de043, type: 3}
+  goal: {fileID: 8300000, guid: b6428d4edb06344ba829da4edd9967c1, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
